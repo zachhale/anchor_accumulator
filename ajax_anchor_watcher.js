@@ -44,8 +44,8 @@ AjaxAnchorWatcher.prototype = {
     
         anchor_pairs.each(function(anchor_pair) {
           var split_pair = anchor_pair.match(/([^#&]+)=([^#&]*)/);
-          key = split_pair[1];
-          val = split_pair[2];
+          var key = split_pair[1];
+          var val = split_pair[2];
           
           key_value_anchor_pair_count++;
           
@@ -93,9 +93,9 @@ AjaxAnchorWatcher.prototype = {
             });
           }
         }
+        
+        watcher.first_run = false;
       }
-    }
-    
-    watcher.first_run = false;
+    }    
   }
 }
