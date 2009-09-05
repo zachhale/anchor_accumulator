@@ -1,0 +1,10 @@
+Ajax Anchor Watcher for Prototype
+=================================
+
+Lets you incrementally link to anchors that define query string parameters for sending to a url of choice and then updating an element with the contents.
+
+Just include the ajax_anchor_watcher.js file with a script tag and attach one line to the load dom event as in the example.html.
+
+---------------------------------
+
+All except for prototype.js is licensed under the MIT license Copyright (c), 2009 Zach Hale. prototype.js is licensed under its own respective license.
