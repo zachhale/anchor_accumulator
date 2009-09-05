@@ -53,7 +53,13 @@ AjaxAnchorWatcher.prototype = {
           if (watcher.allowed_anchor_keys == "" || watcher.allowed_anchor_keys == null || 
               watcher.allowed_anchor_keys.include(key)) {
             valid_key_value_anchor_pair_count++;
-            watcher.current_anchor_pairs.set(key, val);
+            
+            // if the val is blank, we'll assume they want to remove that option
+            if (val == "" || val == null) {
+              watcher.current_anchor_pairs.unset(key);
+            } else {
+              watcher.current_anchor_pairs.set(key, val);
+            }
           }
         });
       
