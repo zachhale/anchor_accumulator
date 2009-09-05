@@ -17,6 +17,15 @@ Just include the ajax_anchor_watcher.js file with a script tag and attach one li
   
 Only element and ajax_url are required; ajax_method, ajax_parameters, and allowed_anchor_keys are optional. If ajax_method is not supplied, it will default to "get". If ajax_parameters is not supplied, all will be well. If allowed_anchor_keys is not supplied, any #key=value anchor link will activate AjaxAnchorWatcher.
 
+Parameters for the ajax are set incrementally. An example process:
+
+- If a link to #sort=desc is clicked, the page will call the ajax with ?sort=desc.
+- If a link to #filter=people is clicked, the page will call the ajax with ?sort=desc&filter=people
+- If a link to #sort=rand is clicked, the page will call the ajax ?sort=rand&filter=people
+- If a link to #sort= is clicked, the page will call the ajax with ?filter=people (removing the sort parameter)
+
+If an allowed anchor keys array is sent on initialization of AjaxAnchorWatcher, only links with keys in that array will activate the ajax. All other key value pairs not in that array will act like normal anchor tag links (moving to that point on the page or doing nothing if nothing with an id of that name exists). Any non key value anchors like #top or #post-203 will always work like normal and not activate the anchor watcher ajax call.
+
 ---------------------------------
 
 All except for prototype.js is licensed under the MIT license Copyright (c), 2009 Zach Hale. prototype.js is licensed under its own respective license.
