@@ -1,31 +1,75 @@
-Ajax Anchor Watcher for Prototype
-=================================
+Anchor Accumulator and Ajax Anchor Accumulator for Prototype
+============================================================
 
-Lets you incrementally link to anchors that define query string parameters for sending to a url of choice and then updating an element with the contents.
+Anchor Accumulator watches for changes to the url hash anchor (everything after the #) and accumulates a collection of key-value pairs identified by clicks to #key=value anchor links. Anchor Accumulator will then call a function of your choosing with a current string of key-value pairs in the form of key=value&second=again&even=more. The function you identify will be called every time the set of key-value pairs is changed.
 
-Just include the ajax_anchor_watcher.js file with a script tag and attach one line to the load dom event as in the example.html.
+Also included is a helper class for using Prototype's Ajax.Request method where you can specify all the usual Ajax.Request options and the accumulated parameters will be tacked on to the request and called each time the pairs change.
 
-  Event.observe(window, 'load', function() {
-    var element = "content";
-    var ajax_url = "/";
-    var ajax_method = "post";
-    var ajax_parameters = "secret=mysterious";
-    var allowed_anchor_keys = ["sort","filter"];
+Basic Usage
+-----------
+
+_Note: Examples are provided in the examples/ directory of this project._
+
+In your HTML file, after including prototype, include anchor_accumulator.js. 
+
+  <script type="text/javascript" src="anchor_accumulator.js"></script>
+
+Then, attach to your page's window load event like so:
+
+  <script type="text/javascript">
+    Event.observe(window, 'load', function() {
+      var callback = function(query_string) {
+        alert("So far we've got " + query_string);
+      }
+      var allowed_anchor_keys = ["sort","filter"]; // optional
+    
+      new AnchorAccumulator(callback, allowed_anchor_keys);      
+    });
+  </script>
   
-    new AjaxAnchorWatcher(element, ajax_url, ajax_method, ajax_parameters, allowed_anchor_keys);      
-  });
-  
-Only element and ajax_url are required; ajax_method, ajax_parameters, and allowed_anchor_keys are optional. If ajax_method is not supplied, it will default to "get". If ajax_parameters is not supplied, all will be well. If allowed_anchor_keys is not supplied, any #key=value anchor link will activate AjaxAnchorWatcher.
+The second parameter with allowed anchor keys is optional. If an array is passed as that parameter, only #key=value links with key in the array will work. For example, if ["sort","filter"] is passed, #sort=desc will work, but #order=desc will not.
 
-Parameters for the ajax are set incrementally. An example process:
+Parameters are set incrementally. An example process:
 
-- If a link to #sort=desc is clicked, the page will call the ajax with ?sort=desc.
-- If a link to #filter=people is clicked, the page will call the ajax with ?sort=desc&filter=people
-- If a link to #sort=rand is clicked, the page will call the ajax ?sort=rand&filter=people
-- If a link to #sort= is clicked, the page will call the ajax with ?filter=people (removing the sort parameter)
+- If a link to #sort=desc is clicked, the page will callback with "sort=desc"
+- If a link to #filter=people is clicked, the page will callback with "sort=desc&filter=people"
+- If a link to #sort=rand is clicked, the page will callback with "sort=rand&filter=people"
+- If a link to #sort= is clicked, the page will callback with "filter=people" (removing the sort parameter)
 
 If an allowed anchor keys array is sent on initialization of AjaxAnchorWatcher, only links with keys in that array will activate the ajax. All other key value pairs not in that array will act like normal anchor tag links (moving to that point on the page or doing nothing if nothing with an id of that name exists). Any non key value anchors like #top or #post-203 will always work like normal and not activate the anchor watcher ajax call.
 
----------------------------------
+Ajax Usage
+----------
+
+Included is an additional file that abstracts working with Prototype's Ajax.Request object simpler. Just include ajax_anchor_accumulator.js in addition to anchor_accumulator.js and use a slightly object initialization on window load.
+
+  <script type="text/javascript" src="anchor_accumulator.js"></script>
+  <script type="text/javascript" src="ajax_anchor_accumulator.js"></script>
+
+  <script type="text/javascript">
+    Event.observe(window, 'load', function() {
+      var ajax_url = "/";
+      var ajax_options = {
+        method: "post",
+        parameters: "secret=mysterious", 
+        onLoaded: function() {
+          alert("Here we go!");
+        },
+        onSuccess: function(transport) {
+          $("update_me").update(transport.responseText);
+        },
+        onFailure: function(transport) { 
+          alert("An error occurred: " + transport.responseText);
+        }
+      }
+      var allowed_anchor_keys = ["sort","filter"];
+      
+      new AjaxAnchorAccumulator(ajax_url, ajax_options, allowed_anchor_keys);    
+    });
+  </script>
+
+The ajax_options object accepts all the same options as Ajax.Request does.
+
+---
 
 All except for prototype.js is licensed under the MIT license Copyright (c), 2009 Zach Hale. prototype.js is licensed under its own respective license.

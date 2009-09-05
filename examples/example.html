@@ -5,7 +5,12 @@
   <script type="text/javascript" src="../anchor_accumulator.js"></script>
   <script type="text/javascript">
     Event.observe(window, 'load', function() {
-      // todo
+      var callback = function(query_string) {
+        alert("So far we've got " + query_string);
+      }
+      var allowed_anchor_keys = ["sort","filter"]; // optional
+    
+      new AnchorAccumulator(callback, allowed_anchor_keys);
     });
   </script>
 </head>

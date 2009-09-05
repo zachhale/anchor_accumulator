@@ -7,7 +7,6 @@
  *--------------------------------------------------------------------------*/
  
 var AjaxAnchorAccumulator = Class.create();
-var ajax_anchor_accumulator = null;
 
 AjaxAnchorAccumulator.prototype = {
   initialize : function(ajax_url, ajax_options, allowed_anchor_keys) {
