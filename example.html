@@ -9,20 +9,21 @@
       var ajax_url = "/";
       var ajax_method = "get";
       var ajax_parameters = "secret=mysterious";
-      var allowed_anchor_keys = ["sausage","cheese"];
+      var allowed_anchor_keys = ["sort","filter"];
       
       new AjaxAnchorWatcher(element, ajax_url, ajax_method, ajax_parameters, allowed_anchor_keys);      
     });
   </script>
 </head>
 <body>
-  <div id="content"></div>
+  <p>
+    sort <a href="#sort=desc">descending</a> or <a href="#sort=asc">ascending</a><br/>
+    filter <a href="#filter=">none</a> or <a href="#filter=people">just people</a><br/>
+    <a href="#debug=true">debug?</a> (this won't work)<br/>
+  </p>
   
   <p>
-    <a href="#sausage=delicious">sausage?</a><br/>
-    <a href="#cheese=good">cheese?</a><br/>
-    <a href="#fish=gross">gross fish?</a>
-    <a href="#fish">fish?</a>
+    go to the <a href="#bottom">bottom of the page</a>
   </p>
   
   <br/>
@@ -94,6 +95,6 @@
   <br/>
   <br/>
   
-  <div id="fish"></div>
+  <div id="bottom">Well hello. You're at the bottom of the page!</div>
 </body>
 </html>

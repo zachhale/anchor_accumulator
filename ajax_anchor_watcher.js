@@ -33,31 +33,33 @@ AjaxAnchorWatcher.prototype = {
     if (document.location.hash != "" && document.location.hash != "#" && 
         watcher.current_anchor != document.location.hash) {
       var hash_without_hash = document.location.hash.split("#")[1];
-      var anchor_pairs_joined_match = hash_without_hash.match(/((([^#&]+)=([^#&]+))&?)+/);
+      var anchor_pairs_joined_match = hash_without_hash.match(/((([^#&]+)=([^#&]*))&?)+/);
       
       if (anchor_pairs_joined_match) {
         var anchor_pairs_joined = anchor_pairs_joined_match[0];
         var anchor_pairs = anchor_pairs_joined.split("&");
-        var key_value_anchor_pair_count = 0; // to make sure all pairs are key value pairs
+        
+        var key_value_anchor_pair_count = 0;
+        var valid_key_value_anchor_pair_count = 0;
     
         anchor_pairs.each(function(anchor_pair) {
-          var split_pair = anchor_pair.match(/([^#&]+)=([^#&]+)/);
+          var split_pair = anchor_pair.match(/([^#&]+)=([^#&]*)/);
           key = split_pair[1];
           val = split_pair[2];
-                    
-          // only if it's a key value pair that's valid
-          if (key && val) {
-            key_value_anchor_pair_count++;
           
-            if (watcher.allowed_anchor_keys == "" || watcher.allowed_anchor_keys == null || 
-                watcher.allowed_anchor_keys.include(key)) {
-              watcher.current_anchor_pairs.set(key, val);
-            }
+          key_value_anchor_pair_count++;
+          
+          // if it's a key value pair that's valid
+          if (watcher.allowed_anchor_keys == "" || watcher.allowed_anchor_keys == null || 
+              watcher.allowed_anchor_keys.include(key)) {
+            valid_key_value_anchor_pair_count++;
+            watcher.current_anchor_pairs.set(key, val);
           }
         });
       
         // if at this point we've got something we need to deal with
-        if (anchor_pairs.length == key_value_anchor_pair_count) {
+        if (anchor_pairs.length == key_value_anchor_pair_count && 
+            key_value_anchor_pair_count == valid_key_value_anchor_pair_count) {
           var generated_query_string = watcher.current_anchor_pairs.toQueryString();
           var generated_anchor = "#" + generated_query_string;
         
