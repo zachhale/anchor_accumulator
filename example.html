@@ -7,9 +7,11 @@
     Event.observe(window, 'load', function() {
       var element = "content";
       var ajax_url = "/";
+      var ajax_method = "get";
+      var ajax_parameters = null;
       var allowed_anchor_keys = ["sausage","cheese"];
       
-      new AjaxAnchorWatcher(element, ajax_url, allowed_anchor_keys);
+      new AjaxAnchorWatcher(element, ajax_url, ajax_method, ajax_parameters, allowed_anchor_keys);      
     });
   </script>
 </head>

@@ -10,14 +10,16 @@ var AjaxAnchorWatcher = Class.create();
 var ajax_anchor_watcher = null;
 
 AjaxAnchorWatcher.prototype = {
-  initialize : function(element, ajax_url, allowed_anchor_keys) {
+  initialize : function(element, ajax_url, ajax_method, ajax_parameters, allowed_anchor_keys) {
     this.element = $(element);
     this.ajax_url = ajax_url;
+    this.ajax_method = ajax_method || "get";
+    this.ajax_parameters = ajax_parameters;
     this.allowed_anchor_keys = allowed_anchor_keys;
     
     this.current_anchor = "#";
     this.current_anchor_pairs = new Hash();
-    this.current_allowed_anchor_pairs = new Hash();
+    this.first_run = true;
     
     ajax_anchor_watcher = this;
     
@@ -47,7 +49,8 @@ AjaxAnchorWatcher.prototype = {
           if (key && val) {
             key_value_anchor_pair_count++;
           
-            if (watcher.allowed_anchor_keys.include(key)) {
+            if (watcher.allowed_anchor_keys == "" || watcher.allowed_anchor_keys == null || 
+                watcher.allowed_anchor_keys.include(key)) {
               watcher.current_anchor_pairs.set(key, val);
             }
           }
@@ -58,12 +61,33 @@ AjaxAnchorWatcher.prototype = {
           var generated_query_string = watcher.current_anchor_pairs.toQueryString();
           var generated_anchor = "#" + generated_query_string;
         
-          watcher.element.update(watcher.ajax_url + generated_query_string); // for debugging
-        
-          watcher.current_anchor = generated_anchor;
-          document.location = watcher.current_anchor;
+          watcher.current_anchor = generated_anchor; // save the anchor
+          
+          // unless it's the first page load, go to the generated anchor and do the ajax
+          if (!watcher.first_run) {
+            document.location = watcher.current_anchor;
+          
+            var generated_ajax_parameters = generated_query_string;
+            if (!(watcher.ajax_parameters == "" || watcher.ajax_parameters == null)) {
+              generated_ajax_parameters += "&" + watcher.ajax_parameters;
+            }
+            
+            // now finally do the ajax
+            new Ajax.Request(watcher.ajax_url, {
+              method: watcher.ajax_method,
+              parameters: generated_ajax_parameters, 
+              onSuccess: function(transport) {
+                watcher.element.update(transport.responseText);
+              },
+              onFailure: function(transport) { 
+                alert("An error occurred: " + transport.responseText);
+              }
+            });
+          }
         }
       }
     }
+    
+    watcher.first_run = false;
   }
 }

@@ -5,6 +5,18 @@ Lets you incrementally link to anchors that define query string parameters for s
 
 Just include the ajax_anchor_watcher.js file with a script tag and attach one line to the load dom event as in the example.html.
 
+  Event.observe(window, 'load', function() {
+    var element = "content";
+    var ajax_url = "/";
+    var ajax_method = "get";
+    var ajax_parameters = null;
+    var allowed_anchor_keys = ["order","first"];
+  
+    new AjaxAnchorWatcher(element, ajax_url, ajax_method, ajax_parameters, allowed_anchor_keys);      
+  });
+  
+Only element and ajax_url are required; ajax_method, ajax_parameters, and allowed_anchor_keys are optional. If ajax_method is not supplied, it will default to "get". If ajax_parameters is not supplied, all will be well. If allowed_anchor_keys is not supplied, any #key=value anchor link will activate AjaxAnchorWatcher.
+
 ---------------------------------
 
 All except for prototype.js is licensed under the MIT license Copyright (c), 2009 Zach Hale. prototype.js is licensed under its own respective license.
