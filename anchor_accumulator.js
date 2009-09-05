@@ -20,7 +20,7 @@ AnchorAccumulator.prototype = {
     
     anchor_accumulator = this;
     
-    setInterval(this.checkAnchor, 200);
+    setInterval(this.checkAnchor, 100);
   },
   
   checkAnchor : function() {
