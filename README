@@ -8,9 +8,9 @@ Just include the ajax_anchor_watcher.js file with a script tag and attach one li
   Event.observe(window, 'load', function() {
     var element = "content";
     var ajax_url = "/";
-    var ajax_method = "get";
-    var ajax_parameters = null;
-    var allowed_anchor_keys = ["order","first"];
+    var ajax_method = "post";
+    var ajax_parameters = "secret=mysterious";
+    var allowed_anchor_keys = ["sort","filter"];
   
     new AjaxAnchorWatcher(element, ajax_url, ajax_method, ajax_parameters, allowed_anchor_keys);      
   });
