@@ -10,12 +10,11 @@ var AnchorAccumulator = Class.create();
 var anchor_accumulator = null;
 
 AnchorAccumulator.prototype = {
-  initialize : function(element, accumulator_function, allowed_anchor_keys) {
-    this.element = $(element);
+  initialize : function(accumulator_function, allowed_anchor_keys) {
     this.accumulator_function = accumulator_function;
     this.allowed_anchor_keys = allowed_anchor_keys;
     
-    this.current_anchor = "#";
+    this.current_anchor = "";
     this.current_anchor_pairs = new Hash();
     this.first_run = true;
     
@@ -32,26 +31,26 @@ AnchorAccumulator.prototype = {
         accumulator.current_anchor != document.location.hash) {
       var hash_without_hash = document.location.hash.split("#")[1];
       var anchor_pairs_joined_match = hash_without_hash.match(/((([^#&]+)=([^#&]*))&?)+/);
-      
+    
       if (anchor_pairs_joined_match) {
         var anchor_pairs_joined = anchor_pairs_joined_match[0];
         var anchor_pairs = anchor_pairs_joined.split("&");
-        
+      
         var key_value_anchor_pair_count = 0;
         var valid_key_value_anchor_pair_count = 0;
-    
+  
         anchor_pairs.each(function(anchor_pair) {
           var split_pair = anchor_pair.match(/([^#&]+)=([^#&]*)/);
           var key = split_pair[1];
           var val = split_pair[2];
-          
+        
           key_value_anchor_pair_count++;
-          
+        
           // if it's a key value pair that's valid
           if (accumulator.allowed_anchor_keys == "" || accumulator.allowed_anchor_keys == null || 
               accumulator.allowed_anchor_keys.include(key)) {
             valid_key_value_anchor_pair_count++;
-            
+          
             // if the val is blank, we'll assume they want to remove that option
             if (val == "" || val == null) {
               accumulator.current_anchor_pairs.unset(key);
@@ -60,15 +59,22 @@ AnchorAccumulator.prototype = {
             }
           }
         });
-      
+    
         // if at this point we've got something we need to deal with, run the function
         if (anchor_pairs.length == key_value_anchor_pair_count && 
             key_value_anchor_pair_count == valid_key_value_anchor_pair_count) {
-          accumulator.accumulator_function(accumulator.current_anchor_pairs);
-        }
+          var generated_query_string = accumulator.current_anchor_pairs.toQueryString();
         
-        accumulator.first_run = false;
-      }
-    }    
+          accumulator.current_anchor = "#" + generated_query_string; // save the anchor
+        
+          if (!accumulator.first_run) {
+            accumulator.accumulator_function(generated_query_string); // run the accumulator function
+            document.location = accumulator.current_anchor; // go to the new anchor
+          }
+        }
+      }      
+    }
+    
+    accumulator.first_run = false;
   }
 }
