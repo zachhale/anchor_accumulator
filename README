@@ -62,7 +62,7 @@ Included is an additional file that abstracts working with Prototype's Ajax.Requ
           alert("An error occurred: " + transport.responseText);
         }
       }
-      var allowed_anchor_keys = ["sort","filter"];
+      var allowed_anchor_keys = ["sort","filter"]; // optional
       
       new AjaxAnchorAccumulator(ajax_url, ajax_options, allowed_anchor_keys);    
     });
