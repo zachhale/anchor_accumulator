@@ -10,9 +10,10 @@ var AnchorAccumulator = Class.create();
 var anchor_accumulator = null;
 
 AnchorAccumulator.prototype = {
-  initialize : function(accumulator_function, allowed_anchor_keys) {
+  initialize : function(accumulator_function, allowed_anchor_keys, refresh_after_callback) {
     this.accumulator_function = accumulator_function;
     this.allowed_anchor_keys = allowed_anchor_keys;
+		this.refresh_after_callback = refresh_after_callback;
     
     this.current_anchor = "";
     this.current_anchor_pairs = new Hash();
@@ -20,16 +21,29 @@ AnchorAccumulator.prototype = {
     
     anchor_accumulator = this;
     
-    setInterval(this.checkAnchor, 100);
+    this.observeAnchorLinks();
+		this.checkAnchor(document.location.hash);
   },
+
+	observeAnchorLinks : function() {
+    var accumulator = anchor_accumulator;
+
+		var all_anchors = $$("a[href^='#']");
+		
+		all_anchors.each(function(elm) {
+			elm.observe("click", function(e) {
+				var new_anchor = e.target.readAttribute('href');
+				accumulator.checkAnchor(new_anchor, e);
+			});
+		})
+	}, 
   
-  checkAnchor : function() {
+  checkAnchor : function(new_anchor, e) {
     var accumulator = anchor_accumulator;
     
     // if the hash has data in it and has new changes
-    if (document.location.hash != "" && document.location.hash != "#" && 
-        accumulator.current_anchor != document.location.hash) {
-      var hash_without_hash = document.location.hash.split("#")[1];
+    if (new_anchor != accumulator.current_anchor) {
+      var hash_without_hash = new_anchor.split("#")[1];
       var anchor_pairs_joined_match = hash_without_hash.match(/((([^#&]+)=([^#&]*))&?)+/);
     
       if (anchor_pairs_joined_match) {
@@ -68,13 +82,18 @@ AnchorAccumulator.prototype = {
           accumulator.current_anchor = "#" + generated_query_string; // save the anchor
         
           if (!accumulator.first_run) {
-            accumulator.accumulator_function(generated_query_string); // run the accumulator function
-            document.location = accumulator.current_anchor; // go to the new anchor
-          }
+	          document.location = accumulator.current_anchor; // go to the new anchor
+	          accumulator.accumulator_function(generated_query_string); // run the accumulator function
+						if (e) {
+							Event.stop(e);
+						}
+						if (accumulator.refresh_after_callback) {
+							accumulator.observeAnchorLinks();
+						}
+					}
         }
       }      
     }
-    
     accumulator.first_run = false;
   }
 }
